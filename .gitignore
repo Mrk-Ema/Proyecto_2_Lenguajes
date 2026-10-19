@@ -1,0 +1,15 @@
+# Maven / compilados
+target/
+build/
+dist/
+*.class
+
+# NetBeans / IDEs
+nbproject/private/
+.idea/
+*.iml
+*.form.bak
+
+# Sistema
+.DS_Store
+Thumbs.db
