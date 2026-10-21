@@ -1,10 +1,16 @@
 package com.mycompany.promptzal_3.ui;
 
+import com.mycompany.promptzal_3.errores.Error;
+import com.mycompany.promptzal_3.errores.GestorErrores;
+import com.mycompany.promptzal_3.errores.TipoError;
+import com.mycompany.promptzal_3.lexico.LectorTokens;
+import com.mycompany.promptzal_3.lexico.Token;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -18,13 +24,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-/**
- * Ventana principal del IDE de PromptZal
- *
- * Organiza el editor a la izquierda y las pestañas de promptzal, errores y
- * reportes a la derecha. Los botones Abrir y Guardar funcionan, compilar y los
- * reportes muestran un aviso de que la lógica aún no existe
- */
+/** Ventana principal del IDE. */
 public class VentanaPrincipal extends JFrame {
 
     /** Programa de ejemplo que se carga al iniciar para ver todos los colores. */
@@ -102,9 +102,7 @@ public class VentanaPrincipal extends JFrame {
                 () -> panelEditor.getEditor().requestFocusInWindow());
     }
 
-    /*
-    *Construcción de la interfaz
-    **/
+    // Interfaz.
 
     private JToolBar crearBarraHerramientas() {
         JToolBar barra = new JToolBar();
@@ -164,9 +162,7 @@ public class VentanaPrincipal extends JFrame {
         return b;
     }
 
-    /*
-    *Acciones
-    **/
+    // Acciones.
     
     private void abrir() {
         if (!confirmarDescartar()) {
@@ -184,8 +180,59 @@ public class VentanaPrincipal extends JFrame {
     }
 
     private void compilar() {
-        etiquetaMensaje.setText(
-                "Compilador pendiente: la lógica se implementará próximamente.");
+        String texto = panelEditor.getTexto();
+        GestorErrores errores = new GestorErrores();
+        List<Token> tokens = new LectorTokens().analizar(texto, errores);
+
+        panelErrores.limpiar();
+        for (Error error : errores.getErrores()) {
+            panelErrores.agregar(nombreTipo(error.getTipo()),
+                    error.getDescripcion(), error.getFila(), error.getColumna(),
+                    error.getEncontrado(), error.getEsperado());
+        }
+
+        String cantidad = tokens.size() == 1
+                ? "1 token"
+                : tokens.size() + " tokens";
+
+        if (errores.hayErrores()) {
+            panelErrores.setSubtitulo(errores.cantidad()
+                    + " error(es) léxico(s) encontrado(s).");
+            pestanas.setSelectedComponent(panelErrores);
+            etiquetaMensaje.setText("Léxico: " + cantidad + ", "
+                    + errores.cantidad() + " error(es).");
+        } else {
+            panelErrores.setSubtitulo("Sin errores léxicos.");
+            pestanas.setSelectedComponent(panelPromptzal);
+            etiquetaMensaje.setText("Léxico correcto: " + cantidad + ".");
+        }
+
+        panelPromptzal.setPrompt(formatearTokens(tokens, errores));
+    }
+
+    private String formatearTokens(List<Token> tokens, GestorErrores errores) {
+        StringBuilder texto = new StringBuilder();
+        texto.append("Vista provisional del análisis léxico (F1)\n");
+        texto.append("=========================================\n\n");
+        texto.append("Tokens: ").append(tokens.size()).append('\n');
+        texto.append("Errores léxicos: ").append(errores.cantidad()).append("\n\n");
+        for (Token token : tokens) {
+            texto.append(token).append('\n');
+        }
+        return texto.toString();
+    }
+
+    private String nombreTipo(TipoError tipo) {
+        switch (tipo) {
+            case LEXICO:
+                return "Léxico";
+            case SINTACTICO:
+                return "Sintáctico";
+            case SEMANTICO:
+                return "Semántico";
+            default:
+                return tipo.name();
+        }
     }
 
     private void mostrarReportes() {
@@ -205,9 +252,7 @@ public class VentanaPrincipal extends JFrame {
     }
 
 
-    /*
-    *Estado de la ventana
-    **/
+    // Estado.
     
     private void actualizarEstado() {
         String nombre = panelEditor.getNombreArchivo();

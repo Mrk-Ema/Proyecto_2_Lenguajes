@@ -1,0 +1,6 @@
+@modelo "prueba lexica"
+#texto ~
+AGENTE prueba {
+  contexto = "archivo con caracteres invalidos"
+  variable a = 0.7
+}

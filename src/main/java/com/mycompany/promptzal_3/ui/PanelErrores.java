@@ -10,17 +10,12 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-/**
- * Pestaña de errores del compilador.
- *
- * <p>La tabla está preparada con las columnas del enunciado, pero permanece
- * vacía hasta que exista el analizador. Los métodos {@link #limpiar()} y
- * {@link #agregar} quedan listos para conectarla más adelante.</p>
- */
+/** Pestaña de errores. */
 public class PanelErrores extends JPanel {
 
     private final DefaultTableModel modelo;
     private final JTable tabla;
+    private final JLabel subtitulo;
 
     public PanelErrores() {
         super(new BorderLayout(0, 8));
@@ -31,7 +26,7 @@ public class PanelErrores extends JPanel {
         titulo.setForeground(Colores.TEXTO);
         titulo.setFont(titulo.getFont().deriveFont(Font.BOLD, 14f));
 
-        JLabel subtitulo = new JLabel("Sin errores registrados (compilador pendiente).");
+        subtitulo = new JLabel("Sin errores registrados.");
         subtitulo.setForeground(Colores.TEXTO_SUAVE);
 
         JPanel cabecera = new JPanel(new BorderLayout());
@@ -70,21 +65,17 @@ public class PanelErrores extends JPanel {
         add(scroll, BorderLayout.CENTER);
     }
 
-    /** Vacía la tabla antes de una nueva compilación. */
+    // Limpia la tabla.
     public void limpiar() {
         modelo.setRowCount(0);
     }
 
-    /**
-     * Agrega una fila de error.
-     *
-     * @param tipo categoría del error (léxico, sintáctico, semántico)
-     * @param descripcion explicación breve
-     * @param fila línea donde se detectó
-     * @param columna columna donde se detectó
-     * @param encontrado token o texto encontrado
-     * @param esperado token o texto esperado
-     */
+    // Cambia el resumen.
+    public void setSubtitulo(String texto) {
+        subtitulo.setText(texto);
+    }
+
+    // Agrega una fila de error.
     public void agregar(String tipo, String descripcion, int fila, int columna,
             String encontrado, String esperado) {
         modelo.addRow(new Object[]{tipo, descripcion, fila, columna,

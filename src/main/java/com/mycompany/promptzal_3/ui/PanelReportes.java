@@ -13,11 +13,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-/**
- * Pestaña de reportes del compilador. Presenta las tres salidas exigidas por
- * el proyecto; cada botón avisa que el reporte se habilitará cuando exista la
- * compilación.
- */
+/** Pestaña de reportes. */
 public class PanelReportes extends JPanel {
 
     public PanelReportes() {

@@ -19,16 +19,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 
-/**
- * Panel del editor de código.
- *
- * <p>Contiene el JTextPane con resaltado, la franja de números de línea, las
- * operaciones de abrir/guardar y el control de cambios sin guardar.</p>
- *
- * <p>El resaltado se aplica con un temporizador corto para no repintar en cada
- * tecla. La compilación no participa en absoluto: escribir y colorear funciona
- * siempre.</p>
- */
+/** Editor de código. */
 public class PanelEditor extends JPanel {
 
     private final JTextPane editor = new JTextPane() {
@@ -38,8 +29,7 @@ public class PanelEditor extends JPanel {
             if (padre == null) {
                 return true;
             }
-            // Si el texto es más ancho que la vista, aparece scroll horizontal
-            // en lugar de ajustar las líneas.
+            // Scroll horizontal si el texto es más ancho.
             return getUI().getPreferredSize(this).width <= padre.getSize().width;
         }
     };
@@ -109,16 +99,7 @@ public class PanelEditor extends JPanel {
         }
     }
 
-    // =====================================================================
-    //  Operaciones de archivo
-    // =====================================================================
-
-    /**
-     * Pide un archivo y lo carga en el editor.
-     *
-     * @param padre componente para centrar el diálogo
-     * @return true si se abrió un archivo
-     */
+    // Archivo.
     public boolean abrirArchivo(Component padre) {
         JFileChooser selector = crearSelector(false);
         selector.setDialogTitle("Abrir programa PromptZal");
@@ -139,13 +120,6 @@ public class PanelEditor extends JPanel {
         }
     }
 
-    /**
-     * Guarda el contenido actual. Si el archivo no tiene ruta todavía, muestra
-     * un selector limitado a .pz y corrige la extensión si hace falta.
-     *
-     * @param padre componente para centrar el diálogo
-     * @return true si se guardó correctamente
-     */
     public boolean guardarArchivo(Component padre) {
         File destino = archivo;
 
@@ -191,10 +165,7 @@ public class PanelEditor extends JPanel {
         return selector;
     }
 
-    /**
-     * Fuerza la extensión .pz en el archivo elegido. Si el usuario escribió
-     * otra extensión, se reemplaza (por ejemplo, programa.txt -> programa.pz).
-     */
+    // Corrige la extensión a .pz.
     private static File asegurarExtensionPz(File archivo) {
         String nombre = archivo.getName();
         if (nombre.toLowerCase().endsWith(".pz")) {
@@ -208,13 +179,6 @@ public class PanelEditor extends JPanel {
         return new File(archivo.getParentFile(), base + ".pz");
     }
 
-    /**
-     * Reemplaza todo el contenido del editor.
-     *
-     * @param texto contenido nuevo
-     * @param archivo archivo asociado, o null si no tiene ruta
-     * @param marcarSucio true si debe quedar marcado como cambio sin guardar
-     */
     public void setTexto(String texto, File archivo, boolean marcarSucio) {
         try {
             editor.getDocument().remove(0, editor.getDocument().getLength());
@@ -232,10 +196,7 @@ public class PanelEditor extends JPanel {
         }
     }
 
-    // =====================================================================
-    //  Consultas y utilidades
-    // =====================================================================
-
+    // Utilidades.
     public JTextPane getEditor() {
         return editor;
     }
@@ -260,14 +221,12 @@ public class PanelEditor extends JPanel {
         this.alCambiarDocumento = alCambiarDocumento;
     }
 
-    /** @return número de línea (1-based) donde está el cursor */
     public int getLineaCursor() {
         int posicion = editor.getCaretPosition();
         Element raiz = editor.getDocument().getDefaultRootElement();
         return raiz.getElementIndex(posicion) + 1;
     }
 
-    /** @return columna (1-based) donde está el cursor */
     public int getColumnaCursor() {
         int posicion = editor.getCaretPosition();
         Element raiz = editor.getDocument().getDefaultRootElement();

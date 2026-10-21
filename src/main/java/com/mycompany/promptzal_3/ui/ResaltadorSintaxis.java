@@ -10,18 +10,11 @@ import javax.swing.text.StyledDocument;
 
 /**
  * Resalta la sintaxis del editor con un solo recorrido del texto.
- *
- * <p>Se reconocen, en este orden de prioridad: comentarios, cadenas,
- * directivas, números, la flecha {@code ->}, símbolos y palabras. Las palabras
- * se clasifican consultando el {@link Diccionario}.</p>
- *
- * <p>No depende de la compilación: se ejecuta cada vez que el documento
- * cambia (con un pequeño retardo desde {@link PanelEditor}).</p>
  */
 public final class ResaltadorSintaxis {
 
     private ResaltadorSintaxis() {
-        // clase de utilidades: no se instancia
+       
     }
 
     /**

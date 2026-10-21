@@ -1,0 +1,31 @@
+@modelo "claude-sonnet-4-6"
+@rol "analista de datos"
+@formato "markdown"
+
+// Agente que prepara el analisis de un archivo de ventas
+/* Los comentarios de bloque
+   tambien se ignoran */
+AGENTE analista {
+  contexto = "Eres un analista de datos experto"
+  variable ventas = CARGAR("ventas.csv")
+  variable saludo = "Hola " + "mundo"
+  variable temperatura = 0.7
+  variable canción = "dato con acentos"
+  PREGUNTAR "Cuales son las 3 tendencias principales?" SOBRE ventas -> tendencias
+  RESUMIR tendencias EN 100 palabras -> resumen
+}
+
+// Segundo agente: muestra el resto de comandos y conectores
+AGENTE demostracion {
+  contexto = "Agente de ejemplo para revisar los colores"
+  variable datos = CARGAR("datos.csv")
+  GENERAR codigo DESDE datos COMO "markdown" -> codigo
+  ANALIZAR datos SOBRE "ventas mensuales" -> analisis
+  TRADUCIR "hola mundo" EN ingles -> saludoIngles
+  CLASIFICAR datos EN "alta, media, baja" -> categoria
+  EXTRAER "correos" DESDE datos -> correos
+}
+
+EJECUTAR analista
+EJECUTAR demostracion
+EXPORTAR resumen, analisis, codigo

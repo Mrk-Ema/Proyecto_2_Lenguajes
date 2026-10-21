@@ -13,7 +13,7 @@ import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Pestaña donde se mostrará el prompt final generado por el compilador.
+ * Pestaña donde se mostrará el prompt final generado por el compilador
  * Por ahora solo presenta el área de texto y un mensaje de espera.
  */
 public class PanelPromptzal extends JPanel {
@@ -60,7 +60,7 @@ public class PanelPromptzal extends JPanel {
         add(scroll, BorderLayout.CENTER);
     }
 
-    /** Muestra un prompt en el área (se usará cuando exista el compilador). */
+    /** Muestra un prompt en el área */
     public void setPrompt(String texto) {
         area.setText(texto);
         area.setCaretPosition(0);

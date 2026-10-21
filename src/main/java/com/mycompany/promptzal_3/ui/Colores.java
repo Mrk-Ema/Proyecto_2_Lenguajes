@@ -8,22 +8,13 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Paleta de colores del IDE.
- *
- * <p><b>Este es el único archivo que hay que editar para cambiar los colores
- * del código.</b> Cada constante de la primera sección corresponde a una
- * categoría del lenguaje; el resaltador las consulta a través de
- * {@link #para(Diccionario.Categoria)}.</p>
- *
- * <p>La segunda sección controla la apariencia general de la interfaz.</p>
- */
+
 public final class Colores {
 
-    // =====================================================================
-    //  1. COLORES DE LA SINTAXIS  (edita aquí)
-    // =====================================================================
-
+    /*
+    *Sintaxis
+    **/
+    
     /** Directivas: @modelo, @rol, @formato. */
     public static final Color DIRECTIVA = new Color(0xC59BFF);
 
@@ -54,9 +45,9 @@ public final class Colores {
     /** Comentarios de línea // y de bloque /* ... *&#47;. */
     public static final Color COMENTARIO = new Color(0x66799F);
 
-    // =====================================================================
-    //  2. COLORES DE LA INTERFAZ
-    // =====================================================================
+    /*
+    *Interfaz
+    **/
 
     public static final Color FONDO = new Color(0x0B1526);
     public static final Color FONDO_EDITOR = new Color(0x0D1728);

@@ -33,12 +33,7 @@ public final class Diccionario {
         // clase de utilidades: no se instancia
     }
 
-    /**
-     * Devuelve la categoría de una palabra del lenguaje.
-     *
-     * @param palabra texto exacto (por ejemplo "PREGUNTAR" o "@modelo")
-     * @return la categoría, o DESCONOCIDA si es un identificador normal
-     */
+    // Categoría de una palabra.
     public static Categoria categoriaDe(String palabra) {
         if (palabra == null || palabra.isEmpty()) {
             return Categoria.DESCONOCIDA;
