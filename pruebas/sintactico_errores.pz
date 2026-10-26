@@ -1,0 +1,17 @@
+@modelo demo
+
+AGENTE uno {
+  contexto = "x"
+  variable a = "x"
+  PREGUNTAR "hola" SOBRE a res
+}
+
+AGENTE dos {
+  contexto = "y"
+  variable b = "y"
+  RESUMIR b EN 100
+}
+
+EJECUTAR uno
+EJECUTAR dos
+EXPORTAR res
