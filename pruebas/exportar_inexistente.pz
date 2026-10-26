@@ -1,0 +1,8 @@
+// EXPORTAR con una variable que no existe en ningun agente.
+AGENTE uno {
+  contexto = "Agente ejecutado"
+  PREGUNTAR "hola" -> salida
+}
+
+EJECUTAR uno
+EXPORTAR salida, fantasma

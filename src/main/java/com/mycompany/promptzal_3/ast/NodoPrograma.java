@@ -5,6 +5,6 @@ import java.util.List;
 public record NodoPrograma(
         List<NodoDirectiva> directivas,
         List<NodoAgente> agentes,
-        List<String> ejecuciones,
-        List<String> exportar) {
+        List<NodoEjecucion> ejecuciones,
+        List<NodoExportacion> exportar) {
 }

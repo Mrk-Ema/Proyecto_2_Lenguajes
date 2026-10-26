@@ -6,7 +6,9 @@ import com.mycompany.promptzal_3.ast.NodoComando;
 import com.mycompany.promptzal_3.ast.NodoConector;
 import com.mycompany.promptzal_3.ast.NodoContexto;
 import com.mycompany.promptzal_3.ast.NodoDirectiva;
+import com.mycompany.promptzal_3.ast.NodoEjecucion;
 import com.mycompany.promptzal_3.ast.NodoExpresion;
+import com.mycompany.promptzal_3.ast.NodoExportacion;
 import com.mycompany.promptzal_3.ast.NodoPrograma;
 import com.mycompany.promptzal_3.ast.NodoTermino;
 import com.mycompany.promptzal_3.ast.NodoUnidad;
@@ -42,8 +44,8 @@ public class Parser {
 
         List<NodoDirectiva> directivas = parseDirectivas();
         List<NodoAgente> agentes = parseAgentes();
-        List<String> ejecuciones = parseEjecuciones();
-        List<String> exportar = parseExportar();
+        List<NodoEjecucion> ejecuciones = parseEjecuciones();
+        List<NodoExportacion> exportar = parseExportar();
 
         if (!es(TipoToken.EOF)) {
             reportar("Se esperaba EOF", actual(), TipoToken.EOF);
@@ -269,8 +271,8 @@ public class Parser {
         return new NodoCargar(sinComillas(archivo.getLexema()), inicio.getFila());
     }
 
-    private List<String> parseEjecuciones() {
-        List<String> ejecuciones = new ArrayList<>();
+    private List<NodoEjecucion> parseEjecuciones() {
+        List<NodoEjecucion> ejecuciones = new ArrayList<>();
         if (!es(TipoToken.EJECUTAR)) {
             reportar("Se esperaba EJECUTAR", actual(), TipoToken.EJECUTAR);
             return ejecuciones;
@@ -280,14 +282,15 @@ public class Parser {
             avanzar();
             Token id = esperar(TipoToken.ID);
             if (id != null) {
-                ejecuciones.add(id.getLexema());
+                ejecuciones.add(new NodoEjecucion(id.getLexema(),
+                        id.getFila()));
             }
         }
         return ejecuciones;
     }
 
-    private List<String> parseExportar() {
-        List<String> exportar = new ArrayList<>();
+    private List<NodoExportacion> parseExportar() {
+        List<NodoExportacion> exportar = new ArrayList<>();
         if (esperar(TipoToken.EXPORTAR) == null) {
             return exportar;
         }
@@ -296,7 +299,7 @@ public class Parser {
         if (id == null) {
             return exportar;
         }
-        exportar.add(id.getLexema());
+        exportar.add(new NodoExportacion(id.getLexema(), id.getFila()));
 
         while (es(TipoToken.COMA)) {
             avanzar();
@@ -304,7 +307,8 @@ public class Parser {
             if (siguiente == null) {
                 break;
             }
-            exportar.add(siguiente.getLexema());
+            exportar.add(new NodoExportacion(siguiente.getLexema(),
+                    siguiente.getFila()));
         }
         return exportar;
     }

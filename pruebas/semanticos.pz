@@ -1,0 +1,22 @@
+// Prueba con los cuatro errores semanticos obligatorios.
+AGENTE principal {
+  contexto = "Agente ejecutado"
+  variable dato = "texto"
+  PREGUNTAR dato SOBRE faltante -> respuesta
+}
+
+AGENTE secundario {
+  contexto = "Agente que no se ejecuta"
+  variable otro = "texto"
+  PREGUNTAR otro -> resultadoSecundario
+}
+
+AGENTE principal {
+  contexto = "Agente duplicado"
+  variable x = "x"
+  PREGUNTAR x -> y
+}
+
+EJECUTAR principal
+EJECUTAR inexistente
+EXPORTAR respuesta, resultadoSecundario

@@ -1,0 +1,11 @@
+// Las excepciones no deben reportarse como variables inexistentes.
+AGENTE generador {
+  contexto = "Prueba de GENERAR y unidades"
+  variable datos = CARGAR("datos.csv")
+  GENERAR codigo DESDE datos COMO "markdown" -> codigo
+  RESUMIR datos EN 100 palabras -> resumen
+  TRADUCIR "hola" EN ingles -> traduccion
+}
+
+EJECUTAR generador
+EXPORTAR codigo, resumen, traduccion

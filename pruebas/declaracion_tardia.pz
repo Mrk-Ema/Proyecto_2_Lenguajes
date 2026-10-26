@@ -1,0 +1,10 @@
+// La variable debe declararse antes de usarse.
+AGENTE orden {
+  contexto = "Prueba de orden de declaracion"
+  variable primera = segunda
+  variable segunda = "valor"
+  PREGUNTAR primera -> salida
+}
+
+EJECUTAR orden
+EXPORTAR salida

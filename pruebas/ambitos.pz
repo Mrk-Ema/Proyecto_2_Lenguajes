@@ -1,0 +1,15 @@
+// Una variable declarada en un agente no es visible en otro.
+AGENTE uno {
+  contexto = "Agente que declara la variable"
+  variable compartida = "valor"
+  PREGUNTAR "hola" -> salida
+}
+
+AGENTE dos {
+  contexto = "Agente que intenta usarla"
+  PREGUNTAR compartida -> salidaDos
+}
+
+EJECUTAR uno
+EJECUTAR dos
+EXPORTAR salida, salidaDos

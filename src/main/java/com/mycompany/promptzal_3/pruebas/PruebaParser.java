@@ -4,7 +4,9 @@ import com.mycompany.promptzal_3.ast.NodoAgente;
 import com.mycompany.promptzal_3.ast.NodoComando;
 import com.mycompany.promptzal_3.ast.NodoConector;
 import com.mycompany.promptzal_3.ast.NodoDirectiva;
+import com.mycompany.promptzal_3.ast.NodoEjecucion;
 import com.mycompany.promptzal_3.ast.NodoExpresion;
+import com.mycompany.promptzal_3.ast.NodoExportacion;
 import com.mycompany.promptzal_3.ast.NodoPrograma;
 import com.mycompany.promptzal_3.ast.NodoTermino;
 import com.mycompany.promptzal_3.ast.NodoVariableDecl;
@@ -65,8 +67,10 @@ public final class PruebaParser {
             imprimirAgente(agente);
         }
 
-        System.out.println("  Ejecutar: " + programa.ejecuciones());
-        System.out.println("  Exportar: " + programa.exportar());
+        System.out.println("  Ejecutar: " + programa.ejecuciones().stream()
+                .map(NodoEjecucion::agente).toList());
+        System.out.println("  Exportar: " + programa.exportar().stream()
+                .map(NodoExportacion::variable).toList());
     }
 
     private static void imprimirAgente(NodoAgente agente) {
