@@ -1,16 +1,16 @@
 package com.mycompany.promptzal_3.ui;
 
+import com.mycompany.promptzal_3.compilador.Compilador;
+import com.mycompany.promptzal_3.compilador.ResultadoCompilacion;
 import com.mycompany.promptzal_3.errores.Error;
 import com.mycompany.promptzal_3.errores.GestorErrores;
 import com.mycompany.promptzal_3.errores.TipoError;
-import com.mycompany.promptzal_3.lexico.LectorTokens;
-import com.mycompany.promptzal_3.lexico.Token;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.List;
+import java.util.concurrent.ExecutionException;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -22,6 +22,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 
 /** Ventana principal del IDE. */
@@ -65,10 +66,12 @@ public class VentanaPrincipal extends JFrame {
     private final PanelErrores panelErrores = new PanelErrores();
     private final PanelReportes panelReportes = new PanelReportes();
     private final JTabbedPane pestanas = new JTabbedPane();
+    private final Compilador compilador = new Compilador();
 
     private final JLabel etiquetaArchivo = new JLabel("sin título");
     private final JLabel etiquetaPosicion = new JLabel("Línea 1, Col 1");
     private final JLabel etiquetaMensaje = new JLabel("Listo");
+    private JButton botonCompilar;
 
     public VentanaPrincipal() {
         super("PromptZal IDE — Proyecto 2");
@@ -83,6 +86,7 @@ public class VentanaPrincipal extends JFrame {
 
         panelEditor.setAlCambiarDocumento(this::actualizarEstado);
         panelEditor.getEditor().addCaretListener(e -> actualizarPosicion());
+        panelErrores.setAlSeleccionarLinea(panelEditor::seleccionarLinea);
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -112,7 +116,8 @@ public class VentanaPrincipal extends JFrame {
         barra.add(boton("Abrir", this::abrir));
         barra.add(boton("Guardar", this::guardar));
         barra.addSeparator(new Dimension(16, 0));
-        barra.add(boton("Compilar", this::compilar));
+        botonCompilar = boton("Compilar", this::compilar);
+        barra.add(botonCompilar);
         barra.add(boton("Reportes", this::mostrarReportes));
         barra.add(Box.createHorizontalGlue());
 
@@ -181,9 +186,37 @@ public class VentanaPrincipal extends JFrame {
 
     private void compilar() {
         String texto = panelEditor.getTexto();
-        GestorErrores errores = new GestorErrores();
-        List<Token> tokens = new LectorTokens().analizar(texto, errores);
+        botonCompilar.setEnabled(false);
+        etiquetaMensaje.setText("Compilando...");
 
+        new SwingWorker<ResultadoCompilacion, Void>() {
+            @Override
+            protected ResultadoCompilacion doInBackground() {
+                return compilador.compilar(texto);
+            }
+
+            @Override
+            protected void done() {
+                botonCompilar.setEnabled(true);
+                try {
+                    mostrarResultado(get());
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                    etiquetaMensaje.setText("Compilación interrumpida.");
+                } catch (ExecutionException ex) {
+                    etiquetaMensaje.setText("Error interno al compilar.");
+                    JOptionPane.showMessageDialog(VentanaPrincipal.this,
+                            "Ocurrió un error inesperado al compilar:\n"
+                            + ex.getCause(),
+                            "Error de compilación",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }.execute();
+    }
+
+    private void mostrarResultado(ResultadoCompilacion resultado) {
+        GestorErrores errores = resultado.errores();
         panelErrores.limpiar();
         for (Error error : errores.getErrores()) {
             panelErrores.agregar(nombreTipo(error.getTipo()),
@@ -191,35 +224,38 @@ public class VentanaPrincipal extends JFrame {
                     error.getEncontrado(), error.getEsperado());
         }
 
-        String cantidad = tokens.size() == 1
-                ? "1 token"
-                : tokens.size() + " tokens";
+        int lexicos = contar(errores, TipoError.LEXICO);
+        int sintacticos = contar(errores, TipoError.SINTACTICO);
+        int semanticos = contar(errores, TipoError.SEMANTICO);
+        int total = errores.cantidad();
 
-        if (errores.hayErrores()) {
-            panelErrores.setSubtitulo(errores.cantidad()
-                    + " error(es) léxico(s) encontrado(s).");
-            pestanas.setSelectedComponent(panelErrores);
-            etiquetaMensaje.setText("Léxico: " + cantidad + ", "
-                    + errores.cantidad() + " error(es).");
-        } else {
-            panelErrores.setSubtitulo("Sin errores léxicos.");
-            pestanas.setSelectedComponent(panelPromptzal);
-            etiquetaMensaje.setText("Léxico correcto: " + cantidad + ".");
-        }
+        panelErrores.setSubtitulo(total == 0
+                ? "Sin errores en la compilación."
+                : total + " error(es): " + lexicos + " léxicos, "
+                + sintacticos + " sintácticos, " + semanticos
+                + " semánticos.");
+        panelPromptzal.setPrompt(resultado.prompt());
 
-        panelPromptzal.setPrompt(formatearTokens(tokens, errores));
+        int indiceErrores = pestanas.indexOfComponent(panelErrores);
+        pestanas.setTitleAt(indiceErrores, total == 0
+                ? "Errores" : "Errores (" + total + ")");
+        pestanas.setSelectedComponent(total == 0
+                ? panelPromptzal : panelErrores);
+
+        etiquetaMensaje.setText("Léxico: " + lexicos
+                + " · Sintáctico: " + sintacticos
+                + " · Semántico: " + semanticos
+                + (total == 0 ? " · prompt generado" : ""));
     }
 
-    private String formatearTokens(List<Token> tokens, GestorErrores errores) {
-        StringBuilder texto = new StringBuilder();
-        texto.append("Vista provisional del análisis léxico (F1)\n");
-        texto.append("=========================================\n\n");
-        texto.append("Tokens: ").append(tokens.size()).append('\n');
-        texto.append("Errores léxicos: ").append(errores.cantidad()).append("\n\n");
-        for (Token token : tokens) {
-            texto.append(token).append('\n');
+    private int contar(GestorErrores errores, TipoError tipo) {
+        int cantidad = 0;
+        for (Error error : errores.getErrores()) {
+            if (error.getTipo() == tipo) {
+                cantidad++;
+            }
         }
-        return texto.toString();
+        return cantidad;
     }
 
     private String nombreTipo(TipoError tipo) {

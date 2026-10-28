@@ -217,6 +217,14 @@ public class PanelEditor extends JPanel {
         return sucio;
     }
 
+    public void seleccionarLinea(int linea) {
+        Element raiz = editor.getDocument().getDefaultRootElement();
+        int indice = Math.max(0, Math.min(linea - 1, raiz.getElementCount() - 1));
+        Element elemento = raiz.getElement(indice);
+        editor.setCaretPosition(elemento.getStartOffset());
+        editor.requestFocusInWindow();
+    }
+
     public void setAlCambiarDocumento(Runnable alCambiarDocumento) {
         this.alCambiarDocumento = alCambiarDocumento;
     }

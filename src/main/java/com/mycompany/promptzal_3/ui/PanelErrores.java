@@ -2,6 +2,9 @@ package com.mycompany.promptzal_3.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.function.IntConsumer;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,6 +19,7 @@ public class PanelErrores extends JPanel {
     private final DefaultTableModel modelo;
     private final JTable tabla;
     private final JLabel subtitulo;
+    private IntConsumer alSeleccionarLinea;
 
     public PanelErrores() {
         super(new BorderLayout(0, 8));
@@ -51,6 +55,14 @@ public class PanelErrores extends JPanel {
         tabla.setGridColor(Colores.BORDE);
         tabla.getTableHeader().setBackground(Colores.PANEL);
         tabla.getTableHeader().setForeground(Colores.TEXTO_SUAVE);
+        tabla.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evento) {
+                if (evento.getClickCount() == 2) {
+                    seleccionarFila();
+                }
+            }
+        });
 
         int[] anchos = {60, 130, 40, 60, 80, 80};
         for (int i = 0; i < anchos.length; i++) {
@@ -84,5 +96,27 @@ public class PanelErrores extends JPanel {
 
     public int cantidadErrores() {
         return modelo.getRowCount();
+    }
+
+    public void setAlSeleccionarLinea(IntConsumer alSeleccionarLinea) {
+        this.alSeleccionarLinea = alSeleccionarLinea;
+    }
+
+    private void seleccionarFila() {
+        int fila = tabla.getSelectedRow();
+        if (fila < 0 || alSeleccionarLinea == null) {
+            return;
+        }
+
+        Object valor = modelo.getValueAt(fila, 2);
+        if (valor == null) {
+            return;
+        }
+
+        try {
+            alSeleccionarLinea.accept(Integer.parseInt(valor.toString()));
+        } catch (NumberFormatException ex) {
+            // La fila no tiene un número válido.
+        }
     }
 }
