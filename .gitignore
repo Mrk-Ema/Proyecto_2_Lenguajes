@@ -4,6 +4,9 @@ build/
 dist/
 *.class
 
+# Reportes generados
+salidas/
+
 # NetBeans / IDEs
 nbproject/private/
 .idea/

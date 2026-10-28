@@ -5,11 +5,15 @@ import com.mycompany.promptzal_3.compilador.ResultadoCompilacion;
 import com.mycompany.promptzal_3.errores.Error;
 import com.mycompany.promptzal_3.errores.GestorErrores;
 import com.mycompany.promptzal_3.errores.TipoError;
+import com.mycompany.promptzal_3.reportes.GeneradorReportes;
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -67,11 +71,13 @@ public class VentanaPrincipal extends JFrame {
     private final PanelReportes panelReportes = new PanelReportes();
     private final JTabbedPane pestanas = new JTabbedPane();
     private final Compilador compilador = new Compilador();
+    private final GeneradorReportes generadorReportes = new GeneradorReportes();
 
     private final JLabel etiquetaArchivo = new JLabel("sin título");
     private final JLabel etiquetaPosicion = new JLabel("Línea 1, Col 1");
     private final JLabel etiquetaMensaje = new JLabel("Listo");
     private JButton botonCompilar;
+    private ResultadoCompilacion ultimoResultado;
 
     public VentanaPrincipal() {
         super("PromptZal IDE — Proyecto 2");
@@ -87,6 +93,8 @@ public class VentanaPrincipal extends JFrame {
         panelEditor.setAlCambiarDocumento(this::actualizarEstado);
         panelEditor.getEditor().addCaretListener(e -> actualizarPosicion());
         panelErrores.setAlSeleccionarLinea(panelEditor::seleccionarLinea);
+        panelReportes.setAcciones(this::abrirReporteErrores,
+                this::abrirReporteSimbolos, this::abrirReporteAst);
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -216,6 +224,7 @@ public class VentanaPrincipal extends JFrame {
     }
 
     private void mostrarResultado(ResultadoCompilacion resultado) {
+        ultimoResultado = resultado;
         GestorErrores errores = resultado.errores();
         panelErrores.limpiar();
         for (Error error : errores.getErrores()) {
@@ -273,7 +282,81 @@ public class VentanaPrincipal extends JFrame {
 
     private void mostrarReportes() {
         pestanas.setSelectedComponent(panelReportes);
-        etiquetaMensaje.setText("Reportes pendientes de implementación.");
+        etiquetaMensaje.setText(ultimoResultado == null
+                ? "Compila antes de abrir reportes."
+                : "Selecciona un reporte para generarlo.");
+    }
+
+    private void abrirReporteErrores() {
+        if (!hayResultado()) {
+            return;
+        }
+        try {
+            abrirReporte(generadorReportes.errores(ultimoResultado.errores()),
+                    "Reporte de errores");
+        } catch (IOException ex) {
+            errorReporte(ex);
+        }
+    }
+
+    private void abrirReporteSimbolos() {
+        if (!hayResultado()) {
+            return;
+        }
+        try {
+            abrirReporte(generadorReportes.simbolos(
+                    ultimoResultado.tablaSimbolos()), "Tabla de símbolos");
+        } catch (IOException ex) {
+            errorReporte(ex);
+        }
+    }
+
+    private void abrirReporteAst() {
+        if (!hayResultado()) {
+            return;
+        }
+        try {
+            abrirReporte(generadorReportes.ast(ultimoResultado.programa()),
+                    "Árbol de análisis sintáctico");
+        } catch (IOException ex) {
+            errorReporte(ex);
+        }
+    }
+
+    private boolean hayResultado() {
+        if (ultimoResultado != null) {
+            return true;
+        }
+        JOptionPane.showMessageDialog(this,
+                "Compila un programa antes de generar reportes.",
+                "PromptZal", JOptionPane.INFORMATION_MESSAGE);
+        return false;
+    }
+
+    private void abrirReporte(Path ruta, String nombre) {
+        Path absoluta = ruta.toAbsolutePath();
+        etiquetaMensaje.setText(nombre + " generado en " + absoluta);
+
+        try {
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().browse(absoluta.toUri());
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "Reporte generado en:\n" + absoluta,
+                        nombre, JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (IOException | UnsupportedOperationException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Reporte generado en:\n" + absoluta
+                    + "\n\nNo se pudo abrir el navegador:\n" + ex.getMessage(),
+                    nombre, JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void errorReporte(IOException ex) {
+        JOptionPane.showMessageDialog(this,
+                "No se pudo generar el reporte:\n" + ex.getMessage(),
+                "Error de reporte", JOptionPane.ERROR_MESSAGE);
     }
 
     private boolean confirmarDescartar() {
