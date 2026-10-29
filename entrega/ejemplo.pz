@@ -1,0 +1,32 @@
+@modelo "ejemplo con errores"
+@rol "demostracion"
+@formato "markdown"
+
+// Agente válido que sí se ejecuta: de aquí sale el prompt de ejemplo.
+AGENTE analista {
+  contexto = "Agente válido para generar el prompt"
+  variable datos = CARGAR("datos.csv")
+  PREGUNTAR "Cuales son las tendencias?" SOBRE datos -> tendencias
+  RESUMIR tendencias EN 100 palabras -> resumen
+}
+
+// Agente con errores intencionales. No se ejecuta, por eso no contamina el prompt.
+AGENTE errores {
+  contexto = "Agente con errores de ejemplo"
+  variable dato = "texto"
+  PREGUNTAR dato SOBRE faltante -> respuesta
+  # ~
+  PREGUNTAR "sin flecha" SOBRE dato
+  variable tarde = noDeclarada
+}
+
+// Agente duplicado: error semántico.
+AGENTE errores {
+  contexto = "Agente duplicado"
+  variable x = "x"
+  PREGUNTAR x -> y
+}
+
+EJECUTAR analista
+EJECUTAR inexistente
+EXPORTAR resumen

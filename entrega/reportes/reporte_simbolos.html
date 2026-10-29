@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tabla de símbolos</title>
+<style>
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    background: #0b1526;
+    color: #e9efff;
+    font-family: "Segoe UI", "Noto Sans", Arial, sans-serif;
+}
+header {
+    padding: 28px 32px 22px;
+    background: linear-gradient(135deg, #101e3a, #0b1526);
+    border-bottom: 1px solid #223a66;
+}
+h1 { margin: 0; font-size: 26px; letter-spacing: .2px; }
+.lead { margin-top: 7px; color: #9db0d8; }
+main { padding: 24px 32px 44px; }
+.resumen { margin: 0 0 16px; color: #9db0d8; }
+.ok {
+    padding: 16px 18px;
+    border: 1px solid #2b6b4a;
+    background: #0d2a1f;
+    border-radius: 8px;
+    color: #8fe39a;
+    font-weight: 600;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #223a66;
+    border-radius: 8px;
+    overflow: hidden;
+}
+th, td {
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid #223a66;
+}
+th { background: #101e3a; color: #9db0d8; font-size: 13px; }
+tr:nth-child(even) td { background: #0d1728; }
+tr:last-child td { border-bottom: 0; }
+.tipo { white-space: nowrap; font-weight: 600; }
+.tipo-lexico { color: #ffb547; }
+.tipo-sintactico { color: #ff7ab3; }
+.tipo-semantico { color: #3fdcef; }
+.vacio { color: #66799f; }
+pre {
+    margin: 0;
+    padding: 18px;
+    border: 1px solid #223a66;
+    border-radius: 8px;
+    background: #0d1728;
+    color: #e9efff;
+    overflow: auto;
+    line-height: 1.45;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas,
+            "DejaVu Sans Mono", monospace;
+    font-size: 13px;
+}
+footer {
+    padding: 14px 32px;
+    border-top: 1px solid #223a66;
+    color: #66799f;
+    font-size: 12px;
+}
+</style>
+</head>
+<body>
+<header>
+<h1>Tabla de símbolos</h1>
+<div class="lead">Agentes, variables y resultados registrados durante la compilación.</div>
+</header>
+<main>
+<div class="resumen">2 agentes · 3 variables · 4 resultados de comando.</div>
+<table>
+<thead><tr><th>Nombre</th><th>Tipo</th><th>Ámbito</th><th>Línea</th></tr></thead>
+<tbody>
+<tr><td>datos</td><td>Variable declarada</td><td>analista</td><td>8</td></tr>
+<tr><td>tendencias</td><td>Resultado de comando</td><td>analista</td><td>9</td></tr>
+<tr><td>resumen</td><td>Resultado de comando</td><td>analista</td><td>10</td></tr>
+<tr><td>dato</td><td>Variable declarada</td><td>errores</td><td>16</td></tr>
+<tr><td>respuesta</td><td>Resultado de comando</td><td>errores</td><td>17</td></tr>
+<tr><td>x</td><td>Variable declarada</td><td>errores</td><td>26</td></tr>
+<tr><td>y</td><td>Resultado de comando</td><td>errores</td><td>27</td></tr>
+<tr><td>analista</td><td>Agente</td><td>global</td><td>6</td></tr>
+<tr><td>errores</td><td>Agente</td><td>global</td><td>14</td></tr>
+</tbody>
+</table>
+</main>
+<footer>PromptZal · Proyecto 2 · Reporte generado por el compilador</footer>
+</body>
+</html>

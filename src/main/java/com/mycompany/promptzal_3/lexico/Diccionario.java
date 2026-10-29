@@ -30,10 +30,10 @@ public final class Diccionario {
             "SOBRE", "DESDE", "EN", "COMO");
 
     private Diccionario() {
-        // clase de utilidades: no se instancia
+        // clase de utilidades
     }
 
-    // Categoría de una palabra.
+    // Categoría de una palabra
     public static Categoria categoriaDe(String palabra) {
         if (palabra == null || palabra.isEmpty()) {
             return Categoria.DESCONOCIDA;

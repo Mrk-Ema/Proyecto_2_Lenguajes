@@ -76,17 +76,23 @@ public class Parser {
             return agentes;
         }
 
+        NodoAgente primero = parseAgente();
+        if (primero != null) {
+            agentes.add(primero);
+        }
+        sincronizarSeccionSiHaceFalta();
+        parseMasAgentes(agentes);
+        return agentes;
+    }
+
+    private void parseMasAgentes(List<NodoAgente> agentes) {
         while (es(TipoToken.AGENTE)) {
             NodoAgente agente = parseAgente();
             if (agente != null) {
                 agentes.add(agente);
             }
-            if (!es(TipoToken.AGENTE) && !es(TipoToken.EJECUTAR)
-                    && !es(TipoToken.EXPORTAR) && !es(TipoToken.EOF)) {
-                sincronizarSeccion();
-            }
+            sincronizarSeccionSiHaceFalta();
         }
-        return agentes;
     }
 
     private NodoAgente parseAgente() {
@@ -151,13 +157,21 @@ public class Parser {
             return comandos;
         }
 
+        NodoComando primero = parseComando();
+        if (primero != null) {
+            comandos.add(primero);
+        }
+        parseMasComandos(comandos);
+        return comandos;
+    }
+
+    private void parseMasComandos(List<NodoComando> comandos) {
         while (es(TipoToken.COMANDO_IA)) {
             NodoComando comando = parseComando();
             if (comando != null) {
                 comandos.add(comando);
             }
         }
-        return comandos;
     }
 
     private NodoComando parseComando() {
@@ -203,7 +217,11 @@ public class Parser {
             return new NodoExpresion(terminos);
         }
         terminos.add(primero);
+        parseMasTerminos(terminos);
+        return new NodoExpresion(terminos);
+    }
 
+    private void parseMasTerminos(List<NodoTermino> terminos) {
         while (es(TipoToken.MAS)) {
             avanzar();
             NodoTermino siguiente = parseTermino();
@@ -212,7 +230,6 @@ public class Parser {
             }
             terminos.add(siguiente);
         }
-        return new NodoExpresion(terminos);
     }
 
     private NodoTermino parseTermino() {
@@ -278,15 +295,23 @@ public class Parser {
             return ejecuciones;
         }
 
-        while (es(TipoToken.EJECUTAR)) {
-            avanzar();
-            Token id = esperar(TipoToken.ID);
-            if (id != null) {
-                ejecuciones.add(new NodoEjecucion(id.getLexema(),
-                        id.getFila()));
-            }
-        }
+        parseUnaEjecucion(ejecuciones);
+        parseMasEjecuciones(ejecuciones);
         return ejecuciones;
+    }
+
+    private void parseMasEjecuciones(List<NodoEjecucion> ejecuciones) {
+        while (es(TipoToken.EJECUTAR)) {
+            parseUnaEjecucion(ejecuciones);
+        }
+    }
+
+    private void parseUnaEjecucion(List<NodoEjecucion> ejecuciones) {
+        avanzar();
+        Token id = esperar(TipoToken.ID);
+        if (id != null) {
+            ejecuciones.add(new NodoEjecucion(id.getLexema(), id.getFila()));
+        }
     }
 
     private List<NodoExportacion> parseExportar() {
@@ -300,7 +325,11 @@ public class Parser {
             return exportar;
         }
         exportar.add(new NodoExportacion(id.getLexema(), id.getFila()));
+        parseMasIds(exportar);
+        return exportar;
+    }
 
+    private void parseMasIds(List<NodoExportacion> exportar) {
         while (es(TipoToken.COMA)) {
             avanzar();
             Token siguiente = esperar(TipoToken.ID);
@@ -310,7 +339,6 @@ public class Parser {
             exportar.add(new NodoExportacion(siguiente.getLexema(),
                     siguiente.getFila()));
         }
-        return exportar;
     }
 
     private Token actual() {
@@ -360,6 +388,13 @@ public class Parser {
         while (!es(TipoToken.AGENTE) && !es(TipoToken.EJECUTAR)
                 && !es(TipoToken.EXPORTAR) && !es(TipoToken.EOF)) {
             avanzar();
+        }
+    }
+
+    private void sincronizarSeccionSiHaceFalta() {
+        if (!es(TipoToken.AGENTE) && !es(TipoToken.EJECUTAR)
+                && !es(TipoToken.EXPORTAR) && !es(TipoToken.EOF)) {
+            sincronizarSeccion();
         }
     }
 
